@@ -1,0 +1,200 @@
+/* Import a clean modern font from Google */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* Basic setup */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #eef2f5; /* Light soft gray background */
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* AUTHENTICATION WRAPPER - centers the login box */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Full screen height */
+}
+
+.auth-box {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+}
+
+.switch-text {
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.link {
+    color: #007bff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+/* APP WRAPPER - for the main dashboard */
+.app-wrapper {
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px; /* Limits the width for big screens */
+}
+
+/* Header/Navbar Styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+.brand-title {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Dashboard Grid/Flex Layout */
+.dashboard {
+    display: flex;
+    gap: 25px; /* Space between left and right columns */
+}
+
+.left-panel, .right-panel {
+    flex: 1; /* They share the screen equally */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Card Styling for forms and lists */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 18px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    color: #444;
+}
+
+/* Inputs and Buttons */
+input, select {
+    width: 100%;
+    box-sizing: border-box; /* Ensures padding doesn't widen the input */
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #007bff; /* Blue border on click */
+}
+
+button {
+    font-family: inherit;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    width: auto; /* Overrides 100% width for logout button */
+    padding: 10px 20px;
+}
+
+/* List Styling */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border-left: 4px solid #007bff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+
+/* Responsive design for mobile phones */
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column; /* Stack panels on small screens */
+    }
+}
+
+/* Small Delete Button */
+.btn-delete-small {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    width: auto;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.btn-delete-small:hover {
+    opacity: 0.8;
+}
