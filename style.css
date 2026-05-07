@@ -198,3 +198,95 @@ li {
 .btn-delete-small:hover {
     opacity: 0.8;
 }
+
+/* ==========================================
+   ABOUT US BUTTON & MODAL
+   ========================================== */
+
+.btn-about {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #34495e;
+    color: white;
+    width: auto;
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.modal-wrapper {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-box h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    color: #2c3e50;
+}
+
+.about-content hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+.member {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.member-pic {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member h3 {
+    margin: 0 0 10px 0;
+    color: #007bff;
+    font-size: 18px;
+}
+
+.member p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.member a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.member a:hover {
+    text-decoration: underline;
+}

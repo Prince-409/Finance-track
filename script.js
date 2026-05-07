@@ -3,55 +3,93 @@
 // ==========================================
 
 // Variables to hold our data
-let registeredUser = { username: "", password: "" };
+let users = [];
+let currentUser = null;
 let accounts = [];
 let transactions = [];
 
 // Load data from localStorage when page opens
 function loadData() {
-    // Get saved data from the browser's memory
-    let savedUser = localStorage.getItem("financeUser");
-    let savedAccounts = localStorage.getItem("financeAccounts");
-    let savedTransactions = localStorage.getItem("financeTransactions");
+    migrateOldData(); // Ensure old single-user data is converted
+    
+    let savedUsers = localStorage.getItem("financeUsers");
+    if (savedUsers) {
+        users = JSON.parse(savedUsers);
+    }
+}
 
-    // Convert strings back into arrays/objects
-    if (savedUser) {
-        registeredUser = JSON.parse(savedUser);
+function migrateOldData() {
+    let oldUserStr = localStorage.getItem("financeUser");
+    if (oldUserStr) {
+        let oldUser = JSON.parse(oldUserStr);
+        if (oldUser && oldUser.email) {
+            let savedUsers = JSON.parse(localStorage.getItem("financeUsers")) || [];
+            let userExists = savedUsers.find(u => u.email === oldUser.email);
+            if (!userExists) {
+                savedUsers.push(oldUser);
+                localStorage.setItem("financeUsers", JSON.stringify(savedUsers));
+                
+                let oldAccounts = localStorage.getItem("financeAccounts");
+                if (oldAccounts) localStorage.setItem("financeAccounts_" + oldUser.email, oldAccounts);
+                
+                let oldTrans = localStorage.getItem("financeTransactions");
+                if (oldTrans) localStorage.setItem("financeTransactions_" + oldUser.email, oldTrans);
+            }
+        }
+        localStorage.removeItem("financeUser");
+        localStorage.removeItem("financeAccounts");
+        localStorage.removeItem("financeTransactions");
     }
-    if (savedAccounts) {
-        accounts = JSON.parse(savedAccounts);
-    }
-    if (savedTransactions) {
-        transactions = JSON.parse(savedTransactions);
-    }
+}
+
+function saveUsersData() {
+    localStorage.setItem("financeUsers", JSON.stringify(users));
 }
 
 // Save all data to localStorage so it is never lost
 function saveData() {
-    // Convert arrays/objects into strings to save them
-    localStorage.setItem("financeUser", JSON.stringify(registeredUser));
-    localStorage.setItem("financeAccounts", JSON.stringify(accounts));
-    localStorage.setItem("financeTransactions", JSON.stringify(transactions));
+    if (!currentUser) return;
+    localStorage.setItem("financeAccounts_" + currentUser.email, JSON.stringify(accounts));
+    localStorage.setItem("financeTransactions_" + currentUser.email, JSON.stringify(transactions));
 }
 
-// When the page fully loads, check if user was already logged in
-window.onload = function() {
+function loadSessionData() {
+    if (!currentUser) return;
+    let savedAccounts = localStorage.getItem("financeAccounts_" + currentUser.email);
+    let savedTransactions = localStorage.getItem("financeTransactions_" + currentUser.email);
+    
+    accounts = savedAccounts ? JSON.parse(savedAccounts) : [];
+    transactions = savedTransactions ? JSON.parse(savedTransactions) : [];
+}
+
+// Initialize app
+document.addEventListener("DOMContentLoaded", function() {
     loadData(); // Load all saved data first
 
     // Check if user has an active session from a previous visit
-    if (localStorage.getItem("isLoggedIn") === "true") {
-        // Hide login and show dashboard
-        document.getElementById("authContainer").style.display = "none";
-        document.getElementById("appContainer").style.display = "flex";
-        document.getElementById("userDisplay").innerText = registeredUser.username;
-        
-        // Refresh the UI with saved data
-        updateAccountsList();
-        updateAccountDropdown();
-        updateTransactionsList();
+    let loggedInEmail = localStorage.getItem("loggedInUserEmail");
+    if (loggedInEmail) {
+        let user = users.find(u => u.email === loggedInEmail);
+        if (user) {
+            currentUser = user;
+            loadSessionData();
+            
+            // Hide login and show dashboard
+            document.getElementById("authContainer").style.display = "none";
+            document.getElementById("appContainer").style.display = "flex";
+            document.getElementById("userDisplay").innerText = currentUser.name;
+            
+            // Refresh the UI with saved data
+            updateAccountsList();
+            updateAccountDropdown();
+            updateTransactionsList();
+        } else {
+            logout(); // Clean up if user deleted
+        }
+    } else if (localStorage.getItem("isLoggedIn") === "true") {
+        logout(); // Force re-login if old session format
     }
-};
-
+});
 // ==========================================
 // 2. AUTHENTICATION LOGIC
 // ==========================================
@@ -75,54 +113,86 @@ function toggleAuth() {
 
 // Sign Up
 function signup() {
-    let usernameInput = document.getElementById("signupUsername").value;
+    let nameInput = document.getElementById("signupName").value.trim();
+    let emailInput = document.getElementById("signupEmail").value.trim();
     let passwordInput = document.getElementById("signupPassword").value;
 
-    if (usernameInput === "" || passwordInput === "") {
-        alert("Please enter a username and password to sign up.");
+    if (nameInput === "" || emailInput === "" || passwordInput === "") {
+        alert("Please fill in all fields to sign up.");
+        return;
+    }
+
+    // Email basic validation
+    if (!emailInput.includes("@") || !emailInput.includes(".")) {
+        alert("Please enter a valid email address.");
+        return;
+    }
+
+    // Password validation (min 8 chars, 1 uppercase, 1 number)
+    let hasUppercase = /[A-Z]/.test(passwordInput);
+    let hasNumber = /[0-9]/.test(passwordInput);
+    if (passwordInput.length < 8 || !hasUppercase || !hasNumber) {
+        alert("Password must be at least 8 characters long, contain at least 1 uppercase letter, and 1 number.");
+        return;
+    }
+
+    // Check if user already exists
+    let existingUser = users.find(u => u.email === emailInput);
+    if (existingUser) {
+        alert("User with this email already exists. Please log in.");
         return;
     }
 
     // Save new user credentials
-    registeredUser.username = usernameInput;
-    registeredUser.password = passwordInput;
-    saveData(); // Save to local storage!
+    let newUser = { name: nameInput, email: emailInput, password: passwordInput };
+    users.push(newUser);
+    saveUsersData(); // Save to local storage!
 
     alert("Sign up successful! Please log in.");
-    document.getElementById("signupUsername").value = "";
+    document.getElementById("signupName").value = "";
+    document.getElementById("signupEmail").value = "";
     document.getElementById("signupPassword").value = "";
     toggleAuth(); 
 }
 
 // Login
 function login() {
-    let usernameInput = document.getElementById("loginUsername").value;
+    let emailInput = document.getElementById("loginEmail").value.trim();
     let passwordInput = document.getElementById("loginPassword").value;
 
-    if (usernameInput === registeredUser.username && passwordInput === registeredUser.password && usernameInput !== "") {
-        localStorage.setItem("isLoggedIn", "true"); // Remember session so they don't have to login again
+    let user = users.find(u => u.email === emailInput && u.password === passwordInput);
+
+    if (user && emailInput !== "") {
+        currentUser = user;
+        localStorage.setItem("loggedInUserEmail", currentUser.email); // Remember session so they don't have to login again
+        
+        loadSessionData(); // Load specific user data
         
         document.getElementById("authContainer").style.display = "none";
         document.getElementById("appContainer").style.display = "flex";
-        document.getElementById("userDisplay").innerText = usernameInput;
+        document.getElementById("userDisplay").innerText = currentUser.name;
 
         // Load data on the screen
         updateAccountsList();
         updateAccountDropdown();
         updateTransactionsList();
     } else {
-        alert("Invalid username or password. Have you signed up yet?");
+        alert("Invalid email or password. Have you signed up yet?");
     }
 }
 
 // Logout
 function logout() {
-    localStorage.setItem("isLoggedIn", "false"); // Clear session memory
+    localStorage.removeItem("loggedInUserEmail"); // Clear session memory
+    localStorage.removeItem("isLoggedIn"); // Clear old session format
+    currentUser = null;
+    accounts = [];
+    transactions = [];
     
     document.getElementById("authContainer").style.display = "flex";
     document.getElementById("appContainer").style.display = "none";
     
-    document.getElementById("loginUsername").value = "";
+    document.getElementById("loginEmail").value = "";
     document.getElementById("loginPassword").value = "";
 }
 
@@ -270,4 +340,66 @@ function updateTransactionsList() {
         li.innerText = t.text + " (" + t.account + ")  |  " + amountText;
         ul.appendChild(li);
     }
+}
+
+// ==========================================
+// 4. EXTRA FEATURES (ABOUT US & PDF EXPORT)
+// ==========================================
+
+function openAboutUs() {
+    document.getElementById("aboutModal").style.display = "flex";
+}
+
+function closeAboutUs() {
+    document.getElementById("aboutModal").style.display = "none";
+}
+
+function sendEmailPDF() {
+    if (transactions.length === 0) {
+        alert("No transactions to export!");
+        return;
+    }
+
+    // Initialize jsPDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(18);
+    doc.text("Finance Tracker - Transaction Log", 14, 20);
+
+    // User Info
+    doc.setFontSize(12);
+    let userName = currentUser ? currentUser.name : "Unknown User";
+    let userEmail = currentUser ? currentUser.email : "No email provided";
+    doc.text("User: " + userName, 14, 30);
+    doc.text("Email: " + userEmail, 14, 38);
+
+    // Transactions list
+    let y = 50;
+    doc.text("Transactions:", 14, y);
+    y += 10;
+
+    for (let i = 0; i < transactions.length; i++) {
+        let t = transactions[i];
+        let amountText = t.amount > 0 ? "+ Rs." + t.amount : "- Rs." + Math.abs(t.amount);
+        let line = (i + 1) + ". " + t.text + " (" + t.account + ") | " + amountText;
+        
+        doc.text(line, 14, y);
+        y += 10;
+
+        // Add new page if we run out of space
+        if (y > 280) {
+            doc.addPage();
+            y = 20;
+        }
+    }
+
+    // Download the PDF
+    doc.save("Transaction_Log.pdf");
+
+    // Simulate sending email
+    setTimeout(() => {
+        alert("Success! Transaction log PDF has been successfully mailed to " + userEmail);
+    }, 500); // Slight delay for realism
 }

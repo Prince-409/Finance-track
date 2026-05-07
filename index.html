@@ -5,8 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finance Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <!-- jsPDF library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+
+    <!-- About Us Button (Top Left) -->
+    <button class="btn btn-about" onclick="openAboutUs()">About Us</button>
+
+    <!-- About Us Modal (Hidden initially) -->
+    <div id="aboutModal" class="modal-wrapper" style="display: none;">
+        <div class="modal-box">
+            <h2>About Us</h2>
+            <div class="about-content">
+                <div class="member">
+                    <img src="prince.jpg" alt="Prince Raj" class="member-pic" style="object-fit: cover;">
+                    <div class="member-info">
+                        <h3>Member 1: Prince Raj</h3>
+                        <p><strong>Email:</strong> prince1192.be25@chitkarauniversity.edu.in</p>
+                        <p><strong>Phone:</strong> 8002543116 | <strong>City:</strong> Muzaffarpur, Bihar</p>
+                        <p><strong>College:</strong> Chitkara University, Himachal Pradesh (CSE)</p>
+                        <p><strong>Skills:</strong> Python, C, HTML, CSS, Javascript, Git, VS code</p>
+                        <p><strong>Links:</strong> 
+                            <a href="https://www.linkedin.com/in/prince-raj-2a387038a" target="_blank">LinkedIn</a> | 
+                            <a href="https://github.com/Prince-409" target="_blank">GitHub</a>
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <div class="member">
+                    <img src="priyanka.jpg" alt="Priyanka Thakur" class="member-pic" style="object-fit: cover;">
+                    <div class="member-info">
+                        <h3>Member 2: Priyanka Thakur</h3>
+                        <p><strong>Email:</strong> priyanka1195.be25@chitkarauniversity.edu.in</p>
+                        <p><strong>Phone:</strong> +91 8219179518 | <strong>City:</strong> Baddi, Himachal Pradesh</p>
+                        <p><strong>College:</strong> Chitkara University, Himachal Pradesh (CSE)</p>
+                        <p><strong>Skills:</strong> Python, C++, MySQL, HTML, CSS, JavaScript</p>
+                        <p><strong>Links:</strong> 
+                            <a href="#" target="_blank">LinkedIn</a> | 
+                            <a href="https://github.com/priyanka1195be25-cpu" target="_blank">GitHub</a>
+                        </p>
+                    </div>
+                </div>
+                <hr>
+                <div class="member">
+                    <img src="teacher_pic.png" alt="Dr. Abhishek Thakur" class="member-pic" style="object-fit: cover;">
+                    <div class="member-info">
+                        <h3>Dr. Abhishek Thakur</h3>
+                        <p>Project guide and Associate Professor</p>
+                        <p><strong>Links:</strong> 
+                            <a href="https://www.linkedin.com/in/dr-abhishek-thakur-00123321/?_l=en_US" target="_blank">LinkedIn</a> | 
+                            <a href="https://github.com/abhithakur25" target="_blank">GitHub</a> | 
+                            <a href="https://www.facebook.com/abhithakur25/" target="_blank">Facebook</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-danger" style="margin-top: 15px;" onclick="closeAboutUs()">Close</button>
+        </div>
+    </div>
 
     <!-- AUTHENTICATION SCREEN (Login & Sign Up) -->
     <div id="authContainer" class="auth-wrapper">
@@ -15,7 +72,7 @@
             
             <!-- Login Form -->
             <div id="loginForm">
-                <input type="text" id="loginUsername" placeholder="Username">
+                <input type="email" id="loginEmail" placeholder="Email Address">
                 <input type="password" id="loginPassword" placeholder="Password">
                 <button class="btn btn-primary" onclick="login()">Login</button>
                 <p class="switch-text">Don't have an account? <span class="link" onclick="toggleAuth()">Sign up here</span></p>
@@ -23,8 +80,10 @@
 
             <!-- Sign Up Form (Hidden initially) -->
             <div id="signupForm" style="display: none;">
-                <input type="text" id="signupUsername" placeholder="New Username">
-                <input type="password" id="signupPassword" placeholder="New Password">
+                <input type="text" id="signupName" placeholder="Full Name">
+                <input type="email" id="signupEmail" placeholder="Email Address">
+                <input type="password" id="signupPassword" placeholder="Password">
+                <p style="font-size: 12px; color: #666; margin-top: -10px; margin-bottom: 10px; text-align: left;">(Min 8 chars, 1 uppercase, 1 number)</p>
                 <button class="btn btn-primary" onclick="signup()">Sign Up</button>
                 <p class="switch-text">Already have an account? <span class="link" onclick="toggleAuth()">Login here</span></p>
             </div>
@@ -79,6 +138,9 @@
                         <ul id="transactionsList">
                             <!-- Transactions will appear here -->
                         </ul>
+                        <div class="pdf-export">
+                            <button class="btn btn-primary" onclick="sendEmailPDF()" style="margin-top: 15px;">Mail Transaction Log (PDF)</button>
+                        </div>
                     </div>
                 </div>
 
